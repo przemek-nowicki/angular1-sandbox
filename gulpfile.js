@@ -15,8 +15,14 @@ const autoprefixer = require('gulp-autoprefixer');
 const sassLint = require('gulp-sass-lint');
 
 const templateCache = require('gulp-angular-templatecache');
+const jshint = require('gulp-jshint');
 
 const concat = require('gulp-concat');
+
+/**
+ * Run development environment
+ */
+gulp.task('dev', ['serve', 'watch']);
 
 gulp.task('watch', function () {
     gulp.watch(['src/**/*.html'], ['build:html']);
@@ -32,20 +38,9 @@ gulp.task('serve', function() {
 });
 
 /**
- * Run development environment
+ * Run lint tools
  */
-gulp.task('dev', ['serve', 'watch']);
-
-gulp.task('build:css', () => {
-    return gulp.src([
-        srcPath + '/**/*.scss'])
-        .pipe(sass())
-        .pipe(concat('app.css'))
-        .pipe(autoprefixer({
-            browsers: ['last 2 versions']
-        }))
-        .pipe(gulp.dest(compiledPath + '/style'));
-});
+gulp.task('lint', ['lint:js', 'lint:scss']);
 
 gulp.task('lint:scss', () => {
     return gulp.src(srcPath + '/**/*.scss')
@@ -54,8 +49,15 @@ gulp.task('lint:scss', () => {
         .pipe(sassLint.failOnError());
 });
 
+gulp.task('lint:js', () => {
+    gulp.src([srcPath + '/**/*.js'])
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
+        .pipe(jshint.reporter('fail'));
+});
+
 /**
- * Concatenate the contents of all .html-files and save to template.js
+ * Concatenate the contents of all .html files and save to template.js
  */
 gulp.task('build:html', () => {
     return gulp.src([srcPath + '/**/*.html', '!' + srcPath + '/index.html'])
@@ -68,4 +70,18 @@ gulp.task('build:html', () => {
         // TODO: reload only for local env
         .pipe(connect.reload())
         .pipe(gulp.dest(srcPath));
+});
+
+/**
+ * Compile the contents of all .scss files and save to main.css
+ */
+gulp.task('build:css', () => {
+    return gulp.src([
+        srcPath + '/**/*.scss'])
+        .pipe(sass())
+        .pipe(concat('main.css'))
+        .pipe(autoprefixer({
+            browsers: ['last 2 versions']
+        }))
+        .pipe(gulp.dest(compiledPath + '/style'));
 });
