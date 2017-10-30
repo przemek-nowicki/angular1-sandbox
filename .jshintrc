@@ -1,0 +1,15 @@
+{
+  "node": true,
+  "jasmine": true,
+  "quotmark": "single",
+  "curly": true,
+  "eqeqeq": true,
+  "esversion": 6,
+  "globals": {
+    "angular": true,
+    "using": false,
+    "inject": false,
+    "_": false,
+    "$": true
+  }
+}
